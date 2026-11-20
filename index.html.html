@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Päikeseenergia – päikesepaneelid ja -kollektorid</title>
+<style>
+  :root {
+    --primary: #e67e22;
+    --primary-dark: #d35400;
+    --secondary: #2980b9;
+    --dark: #2c3e50;
+    --light: #f8f9fa;
+    --success: #27ae60;
+    --danger: #c0392b;
+    --card-bg: #ffffff;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.55;
+    color: #333;
+    background: #f0f2f5;
+    padding-bottom: 70px;
+  }
+
+  /* ===== HEADER ===== */
+  header {
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+    color: white;
+    padding: 0.9rem 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  header h1 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .menu-btn {
+    background: rgba(255,255,255,0.25);
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ===== SIDE MENU (mobile) ===== */
+  .side-menu {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    width: 280px;
+    height: 100%;
+    background: white;
+    z-index: 300;
+    transition: left 0.3s ease;
+    box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+    overflow-y: auto;
+    padding-top: 1rem;
+  }
+
+  .side-menu.open { left: 0; }
+
+  .side-menu .close-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: #eee;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
+
+  .side-menu h2 {
+    padding: 0.5rem 1.2rem 1rem;
+    font-size: 1.1rem;
+    color: var(--dark);
+    border-bottom: 1px solid #eee;
+  }
+
+  .side-menu button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 0.85rem 1.2rem;
+    border: none;
+    background: none;
+    font-size: 1rem;
+    color: #333;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .side-menu button:hover,
+  .side-menu button.active {
+    background: #fff3e0;
+    color: var(--primary-dark);
+    font-weight: 600;
+  }
+
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 250;
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.3s;
+  }
+
+  .overlay.show {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* ===== DESKTOP NAV (hidden on mobile) ===== */
+  .desktop-nav {
+    display: none;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.7rem;
+    justify-content: center;
+  }
+
+  .desktop-nav button {
+    background: rgba(255,255,255,0.22);
+    border: none;
+    color: white;
+    padding: 0.4rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+
+  .desktop-nav button:hover,
+  .desktop-nav button.active {
+    background: white;
+    color: var(--primary-dark);
+    font-weight: 600;
+  }
+
+  /* ===== PAGES ===== */
+  .page {
+    display: none;
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 1rem;
+    animation: fadeIn 0.25s ease;
+  }
+
+  .page.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .page-card {
+    background: var(--card-bg);
+    border-radius: 14px;
+    padding: 1.3rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+
+  h2 {
+    color: var(--dark);
+    font-size: 1.35rem;
+    margin-bottom: 0.9rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 3px solid var(--primary);
+  }
+
+  h3 {
+    color: var(--secondary);
+    font-size: 1.1rem;
+    margin: 1.1rem 0 0.5rem;
+  }
+
+  p, li { margin-bottom: 0.55rem; font-size: 0.97rem; }
+  ul, ol { padding-left: 1.3rem; }
+
+  /* Cards */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+
+  @media (min-width: 560px) {
+    .grid-2 { grid-template-columns: 1fr 1fr; }
+  }
+
+  .info-card {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 1rem;
+  }
+
+  .info-card.good { border-left: 5px solid var(--success); }
+  .info-card.bad { border-left: 5px solid var(--danger); }
+
+  .term {
+    background: #eaf4fc;
+    border-left: 4px solid var(--secondary);
+    padding: 0.7rem 0.9rem;
+    margin: 0.7rem 0;
+    border-radius: 0 8px 8px 0;
+    font-size: 0.95rem;
+  }
+
+  .term strong { color: var(--secondary); }
+
+  /* Tables */
+  .table-wrap { overflow-x: auto; margin: 0.8rem 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    min-width: 320px;
+  }
+  th, td {
+    border: 1px solid #ddd;
+    padding: 0.55rem 0.6rem;
+    text-align: left;
+  }
+  th { background: var(--secondary); color: white; }
+  tr:nth-child(even) { background: #f5f7fa; }
+
+  /* Scheme */
+  .scheme {
+    background: #f0f7ff;
+    border: 2px dashed var(--secondary);
+    border-radius: 10px;
+    padding: 0.9rem;
+    overflow-x: auto;
+    margin: 1rem 0;
+  }
+  .scheme pre {
+    font-family: 'Courier New', monospace;
+    font-size: 0.78rem;
+    line-height: 1.35;
+    white-space: pre;
+  }
+
+  /* Calculator */
+  .calc-box {
+    background: #fff8e6;
+    border: 2px solid var(--primary);
+    border-radius: 12px;
+    padding: 1.1rem;
+    margin: 0.8rem 0;
+  }
+
+  /* Simulator */
+  .simulator {
+    background: linear-gradient(180deg, #87CEEB 0%, #e0f7fa 100%);
+    border-radius: 14px;
+    padding: 1.2rem;
+    margin: 0.8rem 0;
+  }
+
+  .sim-controls {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.9rem;
+    margin-bottom: 1rem;
+  }
+
+  @media (min-width: 500px) {
+    .sim-controls { grid-template-columns: 1fr 1fr; }
+  }
+
+  .sim-controls label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.92rem;
+    margin-bottom: 0.25rem;
+  }
+
+  input[type="range"] {
+    width: 100%;
+    height: 8px;
+    accent-color: var(--primary);
+  }
+
+  .output-box {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--dark);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .sun {
+    width: 48px;
+    height: 48px;
+    background: radial-gradient(circle, #f1c40f, #e67e22);
+    border-radius: 50%;
+    margin: 0 auto 0.6rem;
+    box-shadow: 0 0 18px #f1c40f;
+    transition: 0.3s;
+  }
+
+  .panel-visual {
+    height: 70px;
+    background: #1a5276;
+    border: 3px solid #154360;
+    border-radius: 6px;
+    margin: 0.6rem auto 1rem;
+    max-width: 180px;
+    position: relative;
+    transition: 0.3s;
+  }
+
+  .panel-visual::after {
+    content: '';
+    position: absolute;
+    inset: 7px;
+    background: repeating-linear-gradient(90deg, #2e86c1 0 11px, #1a5276 11px 13px);
+    border-radius: 3px;
+  }
+
+  /* Images */
+  img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin: 0.7rem 0;
+  }
+
+  .img-caption {
+    font-size: 0.82rem;
+    color: #666;
+    font-style: italic;
+    margin-top: -0.4rem;
+    margin-bottom: 0.8rem;
+  }
+
+  /* Bottom nav (mobile) */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    display: flex;
+    justify-content: space-around;
+    padding: 0.4rem 0;
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.1);
+    z-index: 150;
+  }
+
+  .bottom-nav button {
+    background: none;
+    border: none;
+    font-size: 0.7rem;
+    color: #666;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 0.3rem 0.4rem;
+    cursor: pointer;
+    min-width: 58px;
+  }
+
+  .bottom-nav button.active {
+    color: var(--primary-dark);
+    font-weight: 700;
+  }
+
+  .bottom-nav .icon { font-size: 1.25rem; }
+
+  /* Home hero */
+  .hero-wrap {
+    position: relative;
+    border-radius: 18px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+    min-height: 320px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #1a5276 url('https://images.unsplash.com/photo-1509391366360-2e959784a276?w=1400&q=85') center/cover no-repeat;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.18);
+  }
+
+  .hero-wrap::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(165deg, 
+      rgba(230,126,34,0.82) 0%, 
+      rgba(243,156,18,0.55) 35%,
+      rgba(41,128,185,0.65) 70%, 
+      rgba(44,62,80,0.85) 100%);
+  }
+
+  .hero {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 2.4rem 1.3rem;
+    color: white;
+  }
+
+  .hero .emoji {
+    font-size: 4rem;
+    margin-bottom: 0.35rem;
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.35));
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  .hero h2 {
+    border: none;
+    font-size: 1.85rem;
+    color: white;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.35);
+    margin-bottom: 0.45rem;
+    letter-spacing: -0.3px;
+  }
+
+  .hero p {
+    color: rgba(255,255,255,0.96);
+    margin-bottom: 1.4rem;
+    font-size: 1.05rem;
+    max-width: 340px;
+    margin-left: auto;
+    margin-right: auto;
+    text-shadow: 0 1px 5px rgba(0,0,0,0.3);
+    line-height: 1.45;
+  }
+
+  .hero-btn {
+    display: inline-block;
+    background: white;
+    color: var(--primary-dark);
+    border: none;
+    padding: 0.75rem 1.6rem;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 0.97rem;
+    cursor: pointer;
+    box-shadow: 0 5px 18px rgba(0,0,0,0.28);
+    transition: 0.2s;
+  }
+
+  .hero-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 22px rgba(0,0,0,0.32);
+  }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+  }
+
+  .stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 0.95rem 0.5rem;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  }
+
+  .stat-card .num {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--primary-dark);
+    display: block;
+  }
+
+  .stat-card .label {
+    font-size: 0.74rem;
+    color: #666;
+    margin-top: 0.15rem;
+  }
+
+  /* Eesti näited highlight */
+  .eesti-box {
+    background: linear-gradient(135deg, #eaf6ff 0%, #fff8f0 100%);
+    border: 2px solid #f39c12;
+    border-radius: 14px;
+    padding: 1.15rem;
+    margin-bottom: 1rem;
+  }
+
+  .eesti-box h3 {
+    margin: 0 0 0.7rem;
+    color: var(--primary-dark);
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .eesti-item {
+    background: white;
+    border-radius: 10px;
+    padding: 0.75rem 0.9rem;
+    margin-bottom: 0.55rem;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+    font-size: 0.92rem;
+  }
+
+  .eesti-item:last-child { margin-bottom: 0; }
+
+  .eesti-item strong {
+    color: var(--secondary);
+    display: block;
+    margin-bottom: 0.15rem;
+  }
+
+  .eesti-item span {
+    color: #555;
+    font-size: 0.87rem;
+  }
+
+  .quick-links {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.7rem;
+    margin-top: 0.5rem;
+  }
+
+  .quick-links button {
+    background: white;
+    border: 2px solid #eee;
+    border-radius: 12px;
+    padding: 1rem 0.6rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--dark);
+    cursor: pointer;
+    transition: 0.2s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  }
+
+  .quick-links button:hover {
+    border-color: var(--primary);
+    background: #fff8f0;
+    transform: translateY(-2px);
+  }
+
+  .quick-links .icon { font-size: 1.6rem; display: block; margin-bottom: 0.3rem; }
+
+  footer {
+    text-align: center;
+    padding: 1.2rem;
+    font-size: 0.82rem;
+    color: #777;
+  }
+
+  /* Desktop adjustments */
+  @media (min-width: 768px) {
+    .menu-btn { display: none; }
+    .desktop-nav { display: flex; }
+    .bottom-nav { display: none; }
+    body { padding-bottom: 0; }
+    header h1 { font-size: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <h1>☀️ Päikeseenergia</h1>
+    <button class="menu-btn" onclick="toggleMenu()" aria-label="Menüü">☰</button>
+  </div>
+  <nav class="desktop-nav" id="desktopNav">
+    <button onclick="showPage('avaleht')" data-page="avaleht">Avaleht</button>
+    <button onclick="showPage('sissejuhatus')" data-page="sissejuhatus">Sissejuhatus</button>
+    <button onclick="showPage('toopohimote')" data-page="toopohimote">Tööpõhimõte</button>
+    <button onclick="showPage('erinevused')" data-page="erinevused">Erinevused</button>
+    <button onclick="showPage('fuusika')" data-page="fuusika">Füüsika</button>
+    <button onclick="showPage('eelised')" data-page="eelised">Eelised</button>
+    <button onclick="showPage('keskkond')" data-page="keskkond">Keskkond</button>
+    <button onclick="showPage('naited')" data-page="naited">Näited</button>
+    <button onclick="showPage('simulaator')" data-page="simulaator">Simulaator</button>
+    <button onclick="showPage('arvutus')" data-page="arvutus">Arvutus</button>
+    <button onclick="showPage('tulevik')" data-page="tulevik">Tulevik</button>
+    <button onclick="showPage('allikad')" data-page="allikad">Allikad</button>
+  </nav>
+</header>
+
+<!-- Mobile side menu -->
+<div class="overlay" id="overlay" onclick="closeMenu()"></div>
+<aside class="side-menu" id="sideMenu">
+  <button class="close-btn" onclick="closeMenu()">✕</button>
+  <h2>Menüü</h2>
+  <button onclick="showPage('avaleht')" data-page="avaleht">🏠 Avaleht</button>
+  <button onclick="showPage('sissejuhatus')" data-page="sissejuhatus">📖 Sissejuhatus</button>
+  <button onclick="showPage('toopohimote')" data-page="toopohimote">⚙️ Tööpõhimõte</button>
+  <button onclick="showPage('erinevused')" data-page="erinevused">🔄 Erinevused</button>
+  <button onclick="showPage('fuusika')" data-page="fuusika">🔬 Füüsika</button>
+  <button onclick="showPage('eelised')" data-page="eelised">✅ Eelised & puudused</button>
+  <button onclick="showPage('keskkond')" data-page="keskkond">🌍 Keskkonnamõju</button>
+  <button onclick="showPage('naited')" data-page="naited">📍 Näited</button>
+  <button onclick="showPage('simulaator')" data-page="simulaator">🎛️ Simulaator</button>
+  <button onclick="showPage('arvutus')" data-page="arvutus">🧮 Arvutus</button>
+  <button onclick="showPage('tulevik')" data-page="tulevik">🚀 Tulevik</button>
+  <button onclick="showPage('allikad')" data-page="allikad">📚 Allikad</button>
+</aside>
+
+<!-- ========== AVALEHT ========== -->
+<section class="page active" id="avaleht">
+  <!-- Hero with background image -->
+  <div class="hero-wrap">
+    <div class="hero">
+      <div class="emoji">☀️</div>
+      <h2>Päikeseenergia</h2>
+      <p>Päikesepaneelid ja -kollektorid – kuidas Päikese energia meieni jõuab ja kuidas seda kasutada</p>
+      <button class="hero-btn" onclick="showPage('simulaator')">Proovi simulaatorit →</button>
+    </div>
+  </div>
+
+  <!-- Quick stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <span class="num">~1000</span>
+      <span class="label">W/m² tippkiirgus</span>
+    </div>
+    <div class="stat-card">
+      <span class="num">15–23%</span>
+      <span class="label">paneeli kasutegur</span>
+    </div>
+    <div class="stat-card">
+      <span class="num">25–30 a</span>
+      <span class="label">paneeli eluiga</span>
+    </div>
+  </div>
+
+  <!-- Eesti näited -->
+  <div class="eesti-box">
+    <h3>🇪🇪 Eesti päikesepargid</h3>
+    <div class="eesti-item">
+      <strong>Risti päikesepark (Lääne-Nigula)</strong>
+      <span>~244 MW · ~340 000 paneeli · üks Baltikumi suurimaid (avati 2026)</span>
+    </div>
+    <div class="eesti-item">
+      <strong>Raadi päikesepark (Tartu lähedal)</strong>
+      <span>74 MWp · Lõuna-Eesti üks suurimaid · rohealadega park</span>
+    </div>
+    <div class="eesti-item">
+      <strong>Kirikmäe päikesepark (Pärnumaa)</strong>
+      <span>~77,5 MW · üle 117 000 paneeli</span>
+    </div>
+    <button onclick="showPage('naited')" style="margin-top:0.7rem;background:var(--primary);color:white;border:none;padding:0.5rem 1.1rem;border-radius:20px;font-size:0.88rem;font-weight:600;cursor:pointer;">Vaata kõiki näiteid →</button>
+  </div>
+
+  <!-- Topic buttons -->
+  <div class="page-card">
+    <h3 style="margin-top:0">Vali teema</h3>
+    <div class="quick-links">
+      <button onclick="showPage('sissejuhatus')"><span class="icon">📖</span>Sissejuhatus</button>
+      <button onclick="showPage('toopohimote')"><span class="icon">⚙️</span>Tööpõhimõte</button>
+      <button onclick="showPage('erinevused')"><span class="icon">🔄</span>Erinevused</button>
+      <button onclick="showPage('fuusika')"><span class="icon">🔬</span>Füüsika</button>
+      <button onclick="showPage('eelised')"><span class="icon">✅</span>Eelised</button>
+      <button onclick="showPage('keskkond')"><span class="icon">🌍</span>Keskkond</button>
+      <button onclick="showPage('naited')"><span class="icon">📍</span>Näited</button>
+      <button onclick="showPage('simulaator')"><span class="icon">🎛️</span>Simulaator</button>
+      <button onclick="showPage('arvutus')"><span class="icon">🧮</span>Arvutus</button>
+      <button onclick="showPage('tulevik')"><span class="icon">🚀</span>Tulevik</button>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SISSEJUHATUS ========== -->
+<section class="page" id="sissejuhatus">
+  <div class="page-card">
+    <h2>1. Sissejuhatus</h2>
+    <p><strong>Päikeseenergia</strong> on Päikeselt kiirgusena Maale jõudev energia. See on taastuv, praktiliselt ammendamatu energiaallikas, mida saab muuta elektriks (fotogalvaanilised paneelid) või soojuseks (päikesekollektorid).</p>
+
+    <h3>Kuidas ja millal hakati kasutama?</h3>
+    <ul>
+      <li>Inimesed on Päikese energiat kasutanud juba antiikajast (nt peeglitega tule süütamine).</li>
+      <li>1839. aastal avastas prantsuse füüsik <strong>Edmond Becquerel</strong> fotogalvaanilise efekti.</li>
+      <li>1883. aastal valmistas Charles Fritts esimese päikeseelemendi (seleen).</li>
+      <li>1954. aastal lõid Bell Labs’i teadlased esimese praktilise räni-päikeseelemendi (efektiivsus ~6%).</li>
+      <li>Alates 1958. aastast kasutati päikesepaneele satelliitidel. Massiline levik kodudes ja parkides algas 2000. aastatel.</li>
+    </ul>
+
+    <img src="https://images.unsplash.com/photo-1509391366360-2e959784a276?w=800&q=80" alt="Päikesepaneelid katusel">
+    <p class="img-caption">Päikesepaneelid elumaja katusel. Allikas: Unsplash.</p>
+  </div>
+</section>
+
+<!-- ========== TÖÖPÕHIMÕTE ========== -->
+<section class="page" id="toopohimote">
+  <div class="page-card">
+    <h2>2. Tööpõhimõte</h2>
+
+    <h3>Kuidas jõuab Päikese energia Maale?</h3>
+    <p>Päikeses toimub termotuumareaktsioon (vesinik → heelium). Tekkinud energia kiirgub elektromagnetlainetena. Maale jõuab umbes 1361 W/m² (päikesekonstant) atmosfääri ülemisel piiril. Maapinnal on selge ilmaga tipptundidel umbes 1000 W/m².</p>
+
+    <h3>Kuidas töötab päikesepaneel?</h3>
+    <ol>
+      <li>Footonid löövad räni aatomitest elektrone vabaks (fotogalvaaniline efekt).</li>
+      <li>p-n-siirde elektriväli eraldab elektronid ja augud.</li>
+      <li>Elektronid liiguvad välisesse vooluringi → tekib alalisvool (DC).</li>
+      <li>Inverter muundab selle vahelduvvooluks (AC).</li>
+    </ol>
+
+    <h3>Kuidas töötab päikesekollektor?</h3>
+    <p>Kollektor neelab Päikese soojuskiirgust. Tume neeldurplaat soojeneb, soojus kantakse vedelikule (vesi + glükool). Soojendatud vedelik viib soojuse boileri või soojusvahetisse – kasutatakse sooja vee või ruumikütte jaoks. Efektiivsus on tavaliselt 50–70%.</p>
+
+    <div class="scheme">
+      <h3 style="margin-top:0">Skeem: Päikesepaneeli tööpõhimõte</h3>
+      <pre>
+      ☀️ PÄIKESE KIIRGUS (footonid)
+               │
+               ▼
+  ┌────────────────────────────┐
+  │   KLAASKATE + ANTIREFLEKS  │
+  ├────────────────────────────┤
+  │  n-tüüpi räni (elektronid) │
+  │ ──────── p-n-SIIRE ─────── │
+  │  p-tüüpi räni (augud)      │
+  ├────────────────────────────┤
+  │     METALLELEKTROODID      │
+  └────────────────────────────┘
+               │
+               ▼
+   ALALISVOOL (DC) → INVERTER → VAHELDUVVOOL (AC)
+      </pre>
+      <p class="img-caption">Skeem koostatud projekti jaoks. Põhineb NASA ja EIA kirjeldustel.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== ERINEVUSED ========== -->
+<section class="page" id="erinevused">
+  <div class="page-card">
+    <h2>3. Päikesepaneel vs kollektor</h2>
+    <div class="table-wrap">
+      <table>
+        <tr>
+          <th>Omadus</th>
+          <th>Päikesepaneel (PV)</th>
+          <th>Päikesekollektor</th>
+        </tr>
+        <tr>
+          <td>Toodab</td>
+          <td>Elektrit</td>
+          <td>Soojust</td>
+        </tr>
+        <tr>
+          <td>Efektiivsus</td>
+          <td>~15–23%</td>
+          <td>~50–70%</td>
+        </tr>
+        <tr>
+          <td>Kasutus</td>
+          <td>Valgustus, seadmed, võrk</td>
+          <td>Soe vesi, küte</td>
+        </tr>
+        <tr>
+          <td>Salvestamine</td>
+          <td>Akud</td>
+          <td>Soojaveeboiler</td>
+        </tr>
+        <tr>
+          <td>Energia muundumine</td>
+          <td>Kiirgus → elekter</td>
+          <td>Kiirgus → soojus</td>
+        </tr>
+      </table>
+    </div>
+    <p>Mõlemas süsteemis muutub <strong>kiirgusenergia</strong> kas elektrienergiaks või soojusenergiaks.</p>
+  </div>
+</section>
+
+<!-- ========== FÜÜSIKA ========== -->
+<section class="page" id="fuusika">
+  <div class="page-card">
+    <h2>4. Füüsika – olulised mõisted</h2>
+
+    <div class="term"><strong>1. Footon</strong> – valguse energiakvant. Energia E = h·f (h – Plancki konstant, f – sagedus).</div>
+    <div class="term"><strong>2. Fotogalvaaniline efekt</strong> – valgus vabastab pooljuhist elektrone, tekitades elektrivoolu.</div>
+    <div class="term"><strong>3. p-n-siire</strong> – piir p-tüüpi ja n-tüüpi pooljuhi vahel; tekitab sisemise elektrivälja.</div>
+    <div class="term"><strong>4. Kasutegur</strong> – toodetud kasuliku energia ja langeva päikesekiirguse suhe. Kaasaegsetel paneelidel 15–23%.</div>
+    <div class="term"><strong>5. Päikesekonstant</strong> – Päikese kiirgusvoo tihedus atmosfääri ülemisel piiril (~1361 W/m²).</div>
+
+    <h3>Millest sõltub elektritootmine?</h3>
+    <ul>
+      <li><strong>Ilm</strong> – pilvisus vähendab tootmist oluliselt.</li>
+      <li><strong>Aastaaeg</strong> – Eestis peamine tootmisperiood märts–september.</li>
+      <li><strong>Suund</strong> – ideaalne on lõunasuund.</li>
+      <li><strong>Kaldenurk</strong> – Eestis optimaalne umbes 35–40°.</li>
+      <li>Temperatuur – paneelid töötavad jahedamas paremini.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ========== EELISED ========== -->
+<section class="page" id="eelised">
+  <div class="page-card">
+    <h2>5. Eelised ja puudused</h2>
+    <div class="grid-2">
+      <div class="info-card good">
+        <h3>✅ Eelised</h3>
+        <ul>
+          <li>Taastuv ja peaaegu ammendamatu</li>
+          <li>Töötamise ajal ei teki CO₂</li>
+          <li>Madalad hoolduskulud</li>
+          <li>Energiasõltumatus (koos akuga)</li>
+          <li>Sobib hajutatud tootmiseks</li>
+        </ul>
+      </div>
+      <div class="info-card bad">
+        <h3>❌ Puudused</h3>
+        <ul>
+          <li>Sõltub ilmast ja kellaajast</li>
+          <li>Suur algne investeering</li>
+          <li>Vajab pinda</li>
+          <li>Tootmine ja utiliseerimine nõuavad energiat</li>
+          <li>Talvel Eestis väike toodang</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== KESKKOND ========== -->
+<section class="page" id="keskkond">
+  <div class="page-card">
+    <h2>6. Keskkonnamõju</h2>
+    <p><strong>Positiivne:</strong> Töötamise ajal peaaegu nullheitmed. Vähendab fossiilkütuste kasutamist. Elutsükli süsiniku jalajälg on kümneid kordi väiksem kui põlevkivielektril.</p>
+
+    <p><strong>Negatiivne:</strong></p>
+    <ul>
+      <li>Tootmisel kasutatakse energiat, vett ja kriitilisi materjale (räni, hõbe, alumiinium).</li>
+      <li>Suured päikesepargid võivad mõjutada elurikkust.</li>
+      <li>Eluea lõpus (25–30 a) tekivad jäätmed. Paneelid on ~95% ulatuses taaskasutatavad, kuid räni eraldamine on keerulisem.</li>
+    </ul>
+    <p>Inimesele otsest ohtu ei kujuta.</p>
+  </div>
+</section>
+
+<!-- ========== NÄITED ========== -->
+<section class="page" id="naited">
+  <div class="page-card">
+    <h2>7. Näited maailmast ja Eestist</h2>
+
+    <h3 style="color:var(--primary-dark)">🇪🇪 Eesti näited</h3>
+    
+    <div class="eesti-item" style="margin-bottom:0.7rem">
+      <strong>Risti päikesepark (Lääne-Nigula vald)</strong>
+      <span>~244 MW võimsus · ~340 000 paneeli · üks Baltikumi suurimaid · avati 2026. aastal · investeering ~125 mln eurot</span>
+    </div>
+    <div class="eesti-item" style="margin-bottom:0.7rem">
+      <strong>Raadi päikesepark (Tartu lähedal)</strong>
+      <span>74 MWp · Lõuna-Eesti üks suurimaid · rohealadega park · Estiko Energia</span>
+    </div>
+    <div class="eesti-item" style="margin-bottom:1rem">
+      <strong>Kirikmäe päikesepark (Pärnumaa, Lääneranna vald)</strong>
+      <span>~77,5 MW · üle 117 000 paneeli · üks Baltimaade suurimaid valmimise ajal</span>
+    </div>
+
+    <h3>🌍 Maailma näited</h3>
+    <div class="eesti-item" style="margin-bottom:0.7rem">
+      <strong>Bhadla Solar Park (India, Rajasthan)</strong>
+      <span>~2245 MW · üks maailma suurimaid üksikuid päikeseparke · asub Thari kõrbes</span>
+    </div>
+    <div class="eesti-item" style="margin-bottom:1rem">
+      <strong>Hiina kõrbepargid (nt Xinjiang)</strong>
+      <span>Mitme GW võimsusega kompleksid · maailma suurimad päikeseenergia tootjad</span>
+    </div>
+
+    <h3>Energia salvestamine</h3>
+    <ul>
+      <li><strong>Akud</strong> (liitiumioon jms) – salvestavad ülejäägi ööseks või pilves ilmaga.</li>
+      <li><strong>Võrku müümine</strong> – ülejääk läheb elektrivõrku.</li>
+      <li><strong>Soojusena salvestamine</strong> – kollektorite puhul soojaveeboileris.</li>
+    </ul>
+
+    <img src="https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?w=800&q=80" alt="Suur päikesepark">
+    <p class="img-caption">Suur päikesepark. Allikas: Unsplash.</p>
+  </div>
+</section>
+
+<!-- ========== SIMULAATOR ========== -->
+<section class="page" id="simulaator">
+  <div class="page-card">
+    <h2>8. Päikesepaneeli simulaator</h2>
+    <p>Muuda kiirgust, pilvisust ja kaldenurka. Jälgi, kuidas muutub tootmine.</p>
+
+    <div class="simulator">
+      <div class="sun" id="sunIcon"></div>
+      <div class="panel-visual" id="panelVisual"></div>
+
+      <div class="sim-controls">
+        <div>
+          <label>Päikesekiirgus: <span id="irrVal">800</span> W/m²</label>
+          <input type="range" id="irradiance" min="100" max="1000" value="800">
+        </div>
+        <div>
+          <label>Pilvisus: <span id="cloudVal">20</span>%</label>
+          <input type="range" id="cloud" min="0" max="100" value="20">
+        </div>
+        <div>
+          <label>Kaldenurk: <span id="tiltVal">35</span>°</label>
+          <input type="range" id="tilt" min="0" max="90" value="35">
+        </div>
+        <div>
+          <label>Nimivõimsus: <span id="powerVal">400</span> W</label>
+          <input type="range" id="ratedPower" min="100" max="600" value="400" step="50">
+        </div>
+      </div>
+
+      <div class="output-box">
+        Hetkeline tootmine: <span id="outputPower">0</span> W<br>
+        <small style="font-weight:400;font-size:0.9rem">Efektiivsus: <span id="eff">0</span>%</small>
+      </div>
+    </div>
+    <p style="font-size:0.88rem;color:#555"><em>Lihtsustatud mudel. Tegelik tootmine sõltub ka temperatuurist, mustusest jm.</em></p>
+  </div>
+</section>
+
+<!-- ========== ARVUTUS ========== -->
+<section class="page" id="arvutus">
+  <div class="page-card">
+    <h2>9. Füüsikaline arvutus</h2>
+    <div class="calc-box">
+      <h3 style="margin-top:0">Ülesanne</h3>
+      <p>Arvuta, kui palju energiat toodab 5 kW süsteem 6 tunni jooksul, kui keskmine võimsus on 70% nimivõimsusest.</p>
+
+      <p><strong>Algandmed:</strong></p>
+      <ul>
+        <li>Nimivõimsus P<sub>n</sub> = 5 kW = 5000 W</li>
+        <li>Aeg t = 6 h</li>
+        <li>Koormustegur = 0,7</li>
+      </ul>
+
+      <p><strong>Valem:</strong> E = P<sub>keskmine</sub> × t = (P<sub>n</sub> × 0,7) × t</p>
+
+      <p><strong>Lahendus:</strong></p>
+      <p>P<sub>keskmine</sub> = 5000 × 0,7 = 3500 W = 3,5 kW</p>
+      <p>E = 3,5 kW × 6 h = <strong>21 kWh</strong></p>
+
+      <p><strong>Selgitus:</strong> 21 kWh piisab näiteks mitme päeva kodumajapidamise valgustusele ja väikeseadmetele. Tegelik toodang Eestis sõltub ilmast.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== TULEVIK ========== -->
+<section class="page" id="tulevik">
+  <div class="page-card">
+    <h2>10. Tulevik</h2>
+    <ul>
+      <li>Kõrgema efektiivsusega paneelid (perovskiit, tandem – laboris üle 30%).</li>
+      <li>Odavamad ja tõhusamad akud.</li>
+      <li>Hübriidsüsteemid (päike + tuul + salvesti).</li>
+      <li>Ujuvad päikesepargid ja agrivoltaika.</li>
+      <li>Parem ringlussevõtt.</li>
+    </ul>
+    <p><strong>Probleemid:</strong> vahelduv tootmine, võrgu stabiilsus, materjalide tarne, jäätmete käitlemine.</p>
+
+    <h3>Võrdlus tuuleenergiaga</h3>
+    <div class="table-wrap">
+      <table>
+        <tr>
+          <th>Omadus</th>
+          <th>Päike</th>
+          <th>Tuul</th>
+        </tr>
+        <tr>
+          <td>Sõltuvus</td>
+          <td>Päevavalgus</td>
+          <td>Tuule kiirus</td>
+        </tr>
+        <tr>
+          <td>Eestis</td>
+          <td>Peamiselt suvi</td>
+          <td>Ühtlasem, ka talvel</td>
+        </tr>
+        <tr>
+          <td>Paigaldus</td>
+          <td>Katused, põllud</td>
+          <td>Kõrged mastid</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ========== ALLIKAD ========== -->
+<section class="page" id="allikad">
+  <div class="page-card">
+    <h2>11. Allikad ja AI kasutamine</h2>
+    <ol>
+      <li>NASA Science – How do Photovoltaics Work?</li>
+      <li>U.S. Energy Information Administration (EIA)</li>
+      <li>Enefit Green / Eesti energiaettevõtete info</li>
+      <li>Keskkonnaagentuur – päikesepaneelide jäätmed</li>
+      <li>Sunly ja meediakajastused Risti päikesepargi kohta</li>
+      <li>Bhadla Solar Park andmed</li>
+    </ol>
+
+    <h3>AI kasutamine</h3>
+    <p>AI-d kasutati teksti kavandamisel, HTML/CSS/JS koodi kirjutamisel, skeemi koostamisel ja arvutuse vormistamisel. Kogu faktiteave on kontrollitud usaldusväärsetest allikatest.</p>
+  </div>
+
+  <footer>
+    Füüsika projekt · Päikeseenergia<br>
+    Veebileht on loodud õppeotstarbel
+  </footer>
+</section>
+
+<!-- Bottom navigation (mobile) -->
+<nav class="bottom-nav">
+  <button onclick="showPage('avaleht')" data-page="avaleht">
+    <span class="icon">🏠</span>Avaleht
+  </button>
+  <button onclick="showPage('toopohimote')" data-page="toopohimote">
+    <span class="icon">⚙️</span>Töö
+  </button>
+  <button onclick="showPage('simulaator')" data-page="simulaator">
+    <span class="icon">🎛️</span>Simulaator
+  </button>
+  <button onclick="showPage('eelised')" data-page="eelised">
+    <span class="icon">✅</span>Eelised
+  </button>
+  <button onclick="toggleMenu()">
+    <span class="icon">☰</span>Menüü
+  </button>
+</nav>
+
+<script>
+  function showPage(id) {
+    // Hide all pages
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    // Show selected
+    const page = document.getElementById(id);
+    if (page) page.classList.add('active');
+
+    // Update active buttons
+    document.querySelectorAll('[data-page]').forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-page') === id);
+    });
+
+    // Close mobile menu
+    closeMenu();
+
+    // Scroll to top
+    window.scrollTo(0, 0);
+  }
+
+  function toggleMenu() {
+    const menu = document.getElementById('sideMenu');
+    const overlay = document.getElementById('overlay');
+    menu.classList.toggle('open');
+    overlay.classList.toggle('show');
+  }
+
+  function closeMenu() {
+    document.getElementById('sideMenu').classList.remove('open');
+    document.getElementById('overlay').classList.remove('show');
+  }
+
+  // Simulator
+  const irr = document.getElementById('irradiance');
+  const cloud = document.getElementById('cloud');
+  const tilt = document.getElementById('tilt');
+  const rated = document.getElementById('ratedPower');
+  const sunIcon = document.getElementById('sunIcon');
+  const panelVisual = document.getElementById('panelVisual');
+
+  function updateSim() {
+    const I = parseFloat(irr.value);
+    const C = parseFloat(cloud.value) / 100;
+    const T = parseFloat(tilt.value);
+    const Pn = parseFloat(rated.value);
+
+    const tiltFactor = Math.cos((T - 35) * Math.PI / 180);
+    const effectiveIrr = I * (1 - C * 0.85) * Math.max(0.3, tiltFactor);
+    const relative = effectiveIrr / 1000;
+    const power = Pn * relative;
+
+    document.getElementById('irrVal').textContent = I;
+    document.getElementById('cloudVal').textContent = cloud.value;
+    document.getElementById('tiltVal').textContent = T;
+    document.getElementById('powerVal').textContent = Pn;
+    document.getElementById('outputPower').textContent = Math.round(power);
+    document.getElementById('eff').textContent = Math.round(relative * 100);
+
+    sunIcon.style.opacity = 0.3 + (1 - C) * 0.7;
+    sunIcon.style.transform = `scale(${0.6 + (I/1000)*0.5})`;
+    panelVisual.style.transform = `rotateX(${T * 0.4}deg)`;
+  }
+
+  [irr, cloud, tilt, rated].forEach(el => el.addEventListener('input', updateSim));
+  updateSim();
+</script>
+
+</body>
+</html>
